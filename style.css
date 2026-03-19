@@ -1,10 +1,10 @@
 :root {
     --numpad-bgc: rgba(174, 174, 174, 0.699);
     --button-bgc: rgba(128, 128, 128, 0.676);
-    --menu-bgc: rgb(108, 107, 107);
+    --menu-bgc: rgb(119, 120, 121);
     --spbtn-bgc: rgb(79, 179, 237);
     --spbtn-bgc-hover: rgb(56, 148, 209);
-
+    --text: whitesmoke;
 }
 
 
@@ -13,7 +13,9 @@
     height: 10vh;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid whitesmoke;
+    border-bottom: 1px solid gray;
+
+    box-shadow: 0px 1px 10px rgba(128, 128, 128, 0.422);
 }
 
 .heading {
@@ -27,17 +29,21 @@
     border-radius: 10px;
     top: 0;
     left: -100%;
-    transition: all, 0.5s;
+    transition: all 0.5s;
 }
 
 #menu {
     background-color: var(--menu-bgc);
+    box-shadow: 1px 1px 20px gray;
+
 }
 
 #menubtn {
-    border-radius: 4px;
+    border-radius: 1rem;
     text-decoration: none;
-    color: white;
+    color: var(--text);
+
+    transition: background-color 0.1s ease-in-out;
 }
 
 #menubtn:hover {
@@ -51,7 +57,7 @@
 } */
 ul a {
     text-decoration: none;
-    color: white;
+    color: var(--text);
     display: flex;
     align-items: center;
 }
@@ -62,7 +68,8 @@ ul a:hover {
 }
 
 .settings {
-    border-top: 1px solid whitesmoke;
+    border-top: 2px solid gray;
+    /* box-shadow: 0 -5px 10px gray, 0 5px 10px gray inset; */
 }
 
 /* DISPLAY */
@@ -128,12 +135,12 @@ ul a:hover {
     height: 100%;
     background-color: var(--button-bgc);
     text-decoration: none;
-    /* text-align: center; */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    /* vertical-align: middle; */
+    border-radius: 1rem;
+
+    transition: background-color 0.1s ease-in-out;
 }
 
 .numpad {

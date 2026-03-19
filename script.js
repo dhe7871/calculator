@@ -1,60 +1,54 @@
 //Variable Declarations
 const e = "2.71828182845";
 const π = "3.14159265359";
-const brackets={p:['(',')'],
-    b:['[',']'],
-    m:['{','}'],
-    n: []
-};
+const tol = 0.000000001;
+const brackets = { p: ["(", ")"], b: ["[", "]"], m: ["{", "}"], n: [] };
 
 /*importing html elements*/
-let standard = document.getElementById('standard');
-let scientific = document.getElementById('scientific');
-let menubtn = document.getElementById('menubtn');
-var dropiobtn = document.getElementById('dropiobtn');
-let inputbox = document.getElementById('inputbox');
-var display = document.getElementById('display');
+let standard = document.getElementById("standard");
+let scientific = document.getElementById("scientific");
+let menubtn = document.getElementById("menubtn");
+var dropiobtn = document.getElementById("dropiobtn");
+let inputbox = document.getElementById("inputbox");
+var display = document.getElementById("display");
 
 //defining initial states for some parameters and variables
 var menu_cond = false;
 var dropiobtn_cond = false;
 var deg = true;
-var ndec=4;
+var ndec = 4;
 var func;
 var calcStr = "";
 var dispStr = "";
-let root=false;
-
-
-
+let root = false;
 
 //if menu button is being clicked, toggle the menu bar
 menubtn.onclick = function () {
     if (!menu_cond) {
-        document.getElementById('menu').style.top = "0";
-        document.getElementById('menu').style.left = "0";
+        document.getElementById("menu").style.top = "0";
+        document.getElementById("menu").style.left = "0";
         menu_cond = true;
     } else {
-        document.getElementById('menu').style.top = "0";
-        document.getElementById('menu').style.left = "-100%";
+        document.getElementById("menu").style.top = "0";
+        document.getElementById("menu").style.left = "-100%";
         menu_cond = false;
     }
-}
+};
 //toggling the calculator to show Standard or Scientific right to the menu icon
 standard.onclick = function () {
-    document.getElementById('heading').innerText = "Standard"
-    document.getElementById('menu').style.left = "-100%";
+    document.getElementById("heading").innerText = "Standard";
+    document.getElementById("menu").style.left = "-100%";
     v = false;
-}
+};
 scientific.onclick = function () {
-    document.getElementById('heading').innerText = "Scientific"
-    document.getElementById('menu').style.left = "-100%";
+    document.getElementById("heading").innerText = "Scientific";
+    document.getElementById("menu").style.left = "-100%";
     v = false;
-}
+};
 
 dropiobtn.onclick = function () {
-    let iotas = document.getElementsByClassName('iotabtn');
-    let anglebtn = document.getElementsByClassName('anglebtn');
+    let iotas = document.getElementsByClassName("iotabtn");
+    let anglebtn = document.getElementsByClassName("anglebtn");
 
     if (!dropiobtn_cond) {
         anglebtn[0].style.display = "flex";
@@ -70,170 +64,122 @@ dropiobtn.onclick = function () {
         dropiobtn.style.backgroundColor = "rgba(128, 128, 128, 0.676)";
         anglebtn[0].style.display = "none";
 
-        dropiobtn_cond = false
+        dropiobtn_cond = false;
     }
-}
-
-
+};
 
 //Alerting in the begining what keys are working and what not
-alert("some of the keys have not been set, as i wanted to make it better.\nThe regular Calculator functions are working fine.\n but some keys are not\nlist of keys not working:\n1. HYPE\n2. INV\n3. 2nd\n4. x^2\n5. x^(1/2)\n6. x^y\n7. 10^x\n8. |x|\n9. +/-\n10. i (actually, i wanted it to make complex calculation as well)\n9. and the Buttons inside menu also not working.")
+alert(
+    "some of the keys have not been set, as i wanted to make it better.\nThe regular Calculator functions are working fine.\n but some keys are not\nlist of keys not working:\n1. HYPE\n2. INV\n3. 2nd\n4. x^2\n5. x^(1/2)\n6. x^y\n7. 10^x\n8. |x|\n9. +/-\n10. i (actually, i wanted it to make complex calculation as well)\n9. and the Buttons inside menu also not working."
+);
+function abs(x) {
+    return x >= 0 ? x : -x;
+}
 
 //function to calculate power needs a revision
 function power(x, y) {
-    if (parseInt(y) == parseFloat(y)) {
-        let product = 1;
-        for (let i = 0; i < Math.abs(y); i++) {
-            product *= x;
+    if (parseInt(y) === y) {
+        let prod = 1;
+        for (let i = 0; i < abs(y); i++) {
+            prod *= x;
         }
-        return ((y >= 0) ? product : 1 / product);
+        return y >= 0 ? prod : 1 / prod;
+    } else if (abs(x) === x) {
+        return exp(y * nlog(x));
     } else {
-        let sum = 1;
-        let term = 1;
-        console.log("sum= " + sum);
-        for (let i = 0; Math.abs(term) >= 0.000000001; i++) {
-            term *= ((y * nlog(x)) / (i + 1));
-            sum += term;
-            console.log("error: " + term);
-            console.log("sum= " + sum);
-        }
-        return (sum);
+        return "Undefined";
     }
 }
 
+//function to evaluate the log10 of a number 0 < x < infinity
+function nlog(x) {
+    if (x <= 0) return "Undefined";
 
-
-//function to reverse a string
-function reverseStr(str) {
-    let newStr = "";
-    for (let i = str.length-1; i >= 0; i--) {
-        newStr += str[i];
+    let n = 0;
+    let temp = x;
+    while(abs(temp) > 1){
+        temp /= e;
+        n++;
     }
-    console.log(newStr);
-    return (newStr);
+
+    let sum = 0;
+    let term = -1;
+    for (let i = 0; abs(term) > tol; i++) {
+        term *= -(temp - 1) / (i + 1);
+        sum += term;
+        term *= (i + 1);
+    }
+    return sum + n;
 }
 
+function log10(x) {
+    return nlog(x) / nlog(10);
+}
 
+function exp(x) {
+    let sum = 1;
+    let term = 1;
+    for (let i = 1; abs(term) > tol; i++) {
+        term *= x / i;
+        sum += term;
+    }
+    return sum;
+}
 
 //function to calculate the factorial of an number
 function factorial(x) {
-    if(parseInt(x)!=parseFloat(x))  return 'Undefined';
+    if (parseInt(x) != parseFloat(x)) return "Undefined";
 
     let prod = 1;
     for (let i = 1; i <= x; i++) {
         prod *= i;
     }
-    return (prod);
+    return prod;
 }
-
-
-
-
-// //function to calculat the absolute ot the mod valuse of the an number
-// function absolute(x) {
-//     return(Math.abs(x));
-// }
-
-
 
 //function to calculate the round off value of an floating point number to the n decimal place
 function roundoff_n(x, n) {
-    let val=x*power(10,n);
-    if(x<0){
-        if(val > Math.floor(val) + 0.5){
-            return Math.ceil(val)/power(10,n);
-        }else{
-            return Math.floor(val)/power(10,n);
+    let val = x * power(10, n);
+    if (x < 0) {
+        if (val > Math.floor(val) + 0.5) {
+            return Math.ceil(val) / power(10, n);
+        } else {
+            return Math.floor(val) / power(10, n);
         }
-    }else{
-        if(val>Math.floor(val)+0.5){
-            return Math.ceil(val)/power(10,n);
-        }else{
-            return Math.floor(val)/power(10,n);
+    } else {
+        if (val > Math.floor(val) + 0.5) {
+            return Math.ceil(val) / power(10, n);
+        } else {
+            return Math.floor(val) / power(10, n);
         }
     }
-    
 }
-
 
 //function to truncate an floating point number till nth decimal place
 function trunc_n(x, n) {
     let i;
 
     x = x.toString();
-    for (i = 0; i < x.length; i++){
-        if(x[i]=='.')   break;
+    for (i = 0; i < x.length; i++) {
+        if (x[i] == ".") break;
     }
 
-    if (i+n <= x.length-1) {
-        x=x.slice(0,i+n+1);
+    if (i + n <= x.length - 1) {
+        x = x.slice(0, i + n + 1);
     }
 
-    return (parseFloat(x));
+    return parseFloat(x);
 }
 
-
-// //function to evaluate the greatest integer of a number
-// function greatestInteger(x) {
-//     return (parseInt(x));
-// }
-
-
-
-// //function to evaluate the sine of an angle 'x' given in degrees 
-// function evalsin(x) {
-//     let i;
-//     let term = x;
-//     let sum = x;
-//     // console.log(typeof (term));
-//     for (i = 1; absolute(term) >= 0.000000001; i += 2) {
-//         term *= -((x * x) / ((i + 1) * (i + 2)));
-//         // console.log(term);
-//         sum += term;
-//         // console.log(sum);
-//     }
-//     // console.log(i);
-//     return (sum);
-// }
-
-
-// //function to evaluate the cosine of an angle 'x' given in degrees
-// function evalcos(x) {
-//     let i;
-//     let term = 1;
-//     let sum = 1;
-//     // console.log(typeof (term));
-//     for (i = 1; absolute(term) >= 0.000000001; i += 2) {
-//         term *= -((x * x) / (i * (i + 1)));
-//         // console.log(term);
-//         sum += term;
-//         // console.log(sum);
-//     }
-//     // console.log(i);
-//     return (sum);
-// }
-
-
-//function to evaluate the log10 of a number 0 < x < infinity
-function logrithm(x) {
-    return (nlog(x) / nlog(10));
-}
-function nlog(x) {
-    let term, sum;
-    let i;
-    for (i = 0; x - power(e, i) >= power(e, i); i++);
-    x = (x - power(e, i)) / power(e, i);
-    sum = (i != 0) ? i + x : x;
-    term = x;
-
-    for (i = 1; absolute(term) >= 0.000000001; i++) {
-        term *= -((i * x) / (i + 1));
-        sum += term;
+//function to reverse a string
+function reverseStr(str) {
+    let newStr = "";
+    for (let i = str.length - 1; i >= 0; i--) {
+        newStr += str[i];
     }
-    return (sum);
+    console.log(newStr);
+    return newStr;
 }
-
-
 
 //function to erase or backspacign in the display of the calculator
 function backspace() {
@@ -246,17 +192,13 @@ function backspace() {
     }
 }
 
-
-
 //function to clear the calculator screen in the display region
 function clearScreen() {
     // let display=document.getElementById('display');
-    display.innerHTML = '<div></div>';
+    display.innerHTML = "<div></div>";
     calcStr = "";
     dispStr = "";
 }
-
-
 
 //printing the results in the display of the calculator
 function printing(a) {
@@ -265,20 +207,17 @@ function printing(a) {
         calcStr += a.innerText;
         dispStr += a.innerText;
         console.log(dispStr);
-    }
-    else {
+    } else {
         display.firstElementChild.style.color = "grey";
         display.firstElementChild.style.fontSize = "2rem";
     }
-
 }
 
-
-let gifb=0;
-let modb=0;
+let gifb = 0;
+let modb = 0;
 //the block of code which inport all the input button in the calculator and check wheather, if any button has been clicked
 //if yes, then it appends the appropriates characters in the 'clacStr' to evaluate it later
-for (let value of document.getElementsByClassName('inputbtn')) {
+for (let value of document.getElementsByClassName("inputbtn")) {
     let a = value;
     // console.log(a.innerText);
     a.onclick = function () {
@@ -292,29 +231,29 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                 case "/":
                 case "(":
                 case ")":
-                case ".": 
+                case ".":
                     printing(a);
                     break;
 
-                case "e": 
+                case "e":
                     dispStr += "e";
-                    calcStr+="e";
+                    calcStr += "e";
                     display.firstElementChild.innerText = dispStr;
                     break;
 
                 case "π":
                     dispStr += "π";
-                    calcStr+= "π";
+                    calcStr += "π";
                     display.firstElementChild.innerText = dispStr;
                     break;
-                
+
                 case "x\ny":
-                    dispStr+="^";
-                    calcStr+="^";
-                    display.firstElementChild.innerText=dispStr;
+                    dispStr += "^";
+                    calcStr += "^";
+                    display.firstElementChild.innerText = dispStr;
                     break;
 
-                case "x\n2": 
+                case "x\n2":
                     // display.firstElementChild.innerText = dispStr + "^2=";
                     // dispStr = power(eval(calcStr), 2).toString();
                     // calcStr = dispStr;
@@ -323,20 +262,20 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                     // display.insertAdjacentHTML('afterbegin', newdivsq.innerHTML);
                     // break;
 
-                    dispStr+="^2";
-                    calcStr+="^2";
-                    display.firstElementChild.innerText= dispStr;
+                    dispStr += "^2";
+                    calcStr += "^2";
+                    display.firstElementChild.innerText = dispStr;
                     break;
 
                 case "10\nx":
-                    console.log('comes here');
-                    dispStr+="10^";
-                    calcStr+="10^";
+                    console.log("comes here");
+                    dispStr += "10^";
+                    calcStr += "10^";
                     console.log(dispStr);
-                    display.firstElementChild.innerText= dispStr;
+                    display.firstElementChild.innerText = dispStr;
                     break;
 
-                case "√x": 
+                case "√x":
                     // display.firstElementChild.innerText = "√" + dispStr + "=";
                     // dispStr = Math.sqrt(eval(calcStr)).toString();
                     // calcStr = dispStr;
@@ -345,12 +284,12 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                     // display.insertAdjacentHTML('afterbegin', newdivsqrt.innerHTML);
                     // break;
 
-                    dispStr+="√(";
-                    calcStr+="√(";
-                    display.firstElementChild.innerText=dispStr;
+                    dispStr += "√(";
+                    calcStr += "√(";
+                    display.firstElementChild.innerText = dispStr;
                     break;
 
-                case "[ x ]": 
+                case "[ x ]":
                     // display.firstElementChild.innerText = "[ " + dispStr + " ]=";
                     // dispStr = parseInt(eval(calcStr)).toString();
                     // calcStr = dispStr;
@@ -359,18 +298,18 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                     // display.insertAdjacentHTML('afterbegin', newdivgre.innerHTML);
                     // break;
 
-                    gifb=(gifb+1)%2;
-                    if(gifb){
-                        dispStr+="[";
-                        calcStr+="[";
-                    }else{
-                        dispStr+="]";
-                        calcStr+="]";
+                    gifb = (gifb + 1) % 2;
+                    if (gifb) {
+                        dispStr += "[";
+                        calcStr += "[";
+                    } else {
+                        dispStr += "]";
+                        calcStr += "]";
                     }
-                    display.firstElementChild.innerText=dispStr;
+                    display.firstElementChild.innerText = dispStr;
                     break;
-                    
-                    //yet to complete
+
+                //yet to complete
 
                 case "| x |":
                     // display.firstElementChild.innerText = "| " + dispStr + " |=";
@@ -381,28 +320,29 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                     // display.insertAdjacentHTML('afterbegin', newdivabs.innerHTML);
                     // break;
 
-                    modb=(modb+1)%2;
-                    dispStr+="|";
+                    modb = (modb + 1) % 2;
+                    dispStr += "|";
 
-                    if(modb){
-                        calcStr+="{";
-                    }else{
-                        
-                        calcStr+="}";
+                    if (modb) {
+                        calcStr += "{";
+                    } else {
+                        calcStr += "}";
                     }
-                    display.firstElementChild.innerText=dispStr;
+                    display.firstElementChild.innerText = dispStr;
                     break;
-                    //yet to complete
+                //yet to complete
 
                 case "( 1/x )":
-                    dispStr += a.innerText.slice(0,1)+a.innerText.slice(2, 4);
-                    calcStr+= a.innerText.slice(0,1)+a.innerText.slice(2, 4);
+                    dispStr +=
+                        a.innerText.slice(0, 1) + a.innerText.slice(2, 4);
+                    calcStr +=
+                        a.innerText.slice(0, 1) + a.innerText.slice(2, 4);
                     display.firstElementChild.innerText = dispStr;
                     break;
 
                 case "n!":
                     dispStr += a.innerText.slice(1);
-                    calcStr+=a.innerText.slice(1);
+                    calcStr += a.innerText.slice(1);
                     display.firstElementChild.innerText = dispStr;
                     break;
 
@@ -415,109 +355,114 @@ for (let value of document.getElementsByClassName('inputbtn')) {
                 case "cosec":
                 case "sec":
                     dispStr += a.innerText + "(";
-                    calcStr+=a.innerText + "(";
+                    calcStr += a.innerText + "(";
                     display.firstElementChild.innerText = dispStr;
                     break;
 
                 case "i":
                     dispStr += a.innerText;
-                    calcStr+=a.innerText;
+                    calcStr += a.innerText;
                     display.firstElementChild.innerText = dispStr;
                     break;
 
-                case "=": printing(a);
-                    process()
+                case "=":
+                    printing(a);
+                    process();
                     calculate();
                     break;
 
-                case "backspace": backspace();
+                case "backspace":
+                    backspace();
                     break;
 
-                case "CE": clearScreen();
+                case "CE":
+                    clearScreen();
                     break;
             }
         }
-
-    }
+    };
 }
 
-
-
-
 //This is the second main function, which tells the program to which values are to evaluate and evalute them and return
-function evaluate(func, arg1,arg2, start, end) {
+function evaluate(func, arg1, arg2, start, end) {
     let argT;
-    let mainStr=calcStr;
+    let mainStr = calcStr;
     let value;
 
-    calcStr=mainStr.slice(0,start);
+    calcStr = mainStr.slice(0, start);
 
     if (arg1.includes("Undefined")) {
-        calcStr+= "Undefined";
-
-    }
-    else {
+        calcStr += "Undefined";
+    } else {
         console.log(arg1);
-        arg1 = parseFloat(eval(arg1));                            //float value of arg
-        argT = (deg) ? arg1*π/180 : arg1;                         //float value for the argument of trig functions
+        arg1 = parseFloat(eval(arg1)); //float value of arg
+        argT = deg ? (arg1 * π) / 180 : arg1; //float value for the argument of trig functions
 
         console.log(argT);
 
-        console.log("func: " + func + " arg1: " + arg1+ 
-           "arg2: "+arg2 + " startingIndex: " + start + " endIndex: " + end);
+        console.log(
+            "func: " +
+                func +
+                " arg1: " +
+                arg1 +
+                "arg2: " +
+                arg2 +
+                " startingIndex: " +
+                start +
+                " endIndex: " +
+                end
+        );
 
         switch (func) {
-            case '(':
-                calcStr+=arg1;
-                break;              //returning change in length in the calcStr string;
+            case "(":
+                calcStr += arg1;
+                break; //returning change in length in the calcStr string;
 
-            case '[':
-                calcStr+=parseInt(arg1);
+            case "[":
+                calcStr += parseInt(arg1);
                 break;
-                
-            case '{':
-                calcStr+=Math.abs(arg1);
+
+            case "{":
+                calcStr += Math.abs(arg1);
                 break;
 
             case "sin":
                 let sin = Math.sin(argT).toString();
-                
+
                 console.log(sin);
                 for (value of sin) {
                     if (value == "e") {
-                        calcStr+="0";
+                        calcStr += "0";
                         break;
                     }
                 }
 
-                if(value=='e') break;
-    
-                calcStr+= sin;
+                if (value == "e") break;
+
+                calcStr += sin;
                 break;
 
             case "cos":
                 let cos = Math.cos(argT).toString();
-    
 
                 console.log(cos);
                 for (value of cos) {
                     if (value == "e") {
-                        calcStr+="0";
+                        calcStr += "0";
                         break;
                     }
                 }
 
-                if(value=='e') break;
-    
-                calcStr+= cos;
+                if (value == "e") break;
+
+                calcStr += cos;
                 break;
 
-            case "tan": 
+            case "tan":
                 let tan = Math.sin(argT) / Math.cos(argT);
 
                 if (Math.cos(argT) == 0) {
-                    calcStr+= "Undefined";
-                    
+                    calcStr += "Undefined";
                 } else {
                     for (value of Math.cos(argT).toString()) {
                         if (value == "e") {
@@ -525,7 +470,7 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e') break;
+                    if (value == "e") break;
 
                     tan = tan.toString();
                     for (value of tan) {
@@ -534,19 +479,18 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e')  break;
-                    
+                    if (value == "e") break;
+
                     calcStr += tan;
                 }
 
                 break;
 
-            case "cot": 
+            case "cot":
                 let cot = Math.cos(argT) / Math.sin(argT);
 
                 if (Math.sin(argT) == 0) {
-                    calcStr+= "Undefined";
-                    
+                    calcStr += "Undefined";
                 } else {
                     for (value of Math.sin(argT).toString()) {
                         if (value == "e") {
@@ -554,7 +498,7 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e') break;
+                    if (value == "e") break;
 
                     cot = cot.toString();
                     for (value of cot) {
@@ -563,19 +507,18 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e')  break;
-                    
+                    if (value == "e") break;
+
                     calcStr += cot;
                 }
 
                 break;
 
-            case "sec": 
+            case "sec":
                 let sec = 1 / Math.cos(argT);
 
                 if (Math.cos(argT) == 0) {
-                    calcStr+= "Undefined";
-                    
+                    calcStr += "Undefined";
                 } else {
                     for (value of Math.cos(argT).toString()) {
                         if (value == "e") {
@@ -583,7 +526,7 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e') break;
+                    if (value == "e") break;
 
                     sec = sec.toString();
                     for (value of sec) {
@@ -592,19 +535,18 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e')  break;
-                    
+                    if (value == "e") break;
+
                     calcStr += sec;
                 }
 
                 break;
 
-            case "cosec": 
+            case "cosec":
                 let cosec = 1 / Math.sin(argT);
 
                 if (Math.sin(argT) == 0) {
-                    calcStr+= "Undefined";
-                    
+                    calcStr += "Undefined";
                 } else {
                     for (value of Math.sin(argT).toString()) {
                         if (value == "e") {
@@ -612,7 +554,7 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e') break;
+                    if (value == "e") break;
 
                     cosec = cosec.toString();
                     for (value of cosec) {
@@ -621,60 +563,58 @@ function evaluate(func, arg1,arg2, start, end) {
                             break;
                         }
                     }
-                    if(value=='e')  break;
-                    
+                    if (value == "e") break;
+
                     calcStr += cosec;
                 }
 
                 break;
 
-            case "!": 
-                if(parseInt(arg1)!=parseFloat(arg1)){
-                    alert("The factorial of an float number is not possible.\nPlease enter valid expression....");
-                    calcStr+='Undefined';
+            case "!":
+                if (parseInt(arg1) != parseFloat(arg1)) {
+                    alert(
+                        "The factorial of an float number is not possible.\nPlease enter valid expression...."
+                    );
+                    calcStr += "Undefined";
                     break;
                 }
 
                 let fact = factorial(arg1);
                 fact = fact.toString();
-                calcStr+=fact;
+                calcStr += fact;
                 break;
 
             case "log":
-                if(arg1<0){
-                    alert("The argument for the logrithm has to be > 0.\nPlease enter valid expression....")
-                    calcStr+='Undefined';
+                if (arg1 < 0) {
+                    alert(
+                        "The argument for the logrithm has to be > 0.\nPlease enter valid expression...."
+                    );
+                    calcStr += "Undefined";
                     break;
                 }
 
-                calcStr+=Math.log10(arg1).toString();
+                calcStr += log10(arg1).toString();
                 break;
 
             case "ln":
-                if(arg1<0){
-                    alert("The argument for the logrithm has to be > 0.\nPlease enter valid expression....")
-                    calcStr+='Undefined';
+                if (arg1 < 0) {
+                    alert(
+                        "The argument for the logrithm has to be > 0.\nPlease enter valid expression...."
+                    );
+                    calcStr += "Undefined";
                     break;
                 }
 
-                calcStr+=(arg1=='e') ? '1' : Math.log(arg1).toString();
+                calcStr += arg1 == "e" ? "1" : nlog(arg1).toString();
                 break;
-            
+
             //after this start making and correcting following functions to evaluate;
-
-            
-
-
-            
         }
     }
 
-
-    calcStr+=mainStr.slice(end+1,);
+    calcStr += mainStr.slice(end + 1);
     return mainStr.length - calcStr.length;
 }
-
-
 
 //the main function of the code, the brain...
 //in this function we process the 'calcStr' string and calculate this string and,
@@ -805,173 +745,162 @@ function evaluate(func, arg1,arg2, start, end) {
 //     display.insertAdjacentHTML('afterbegin', newdiv.innerHTML);
 // }
 
-
-
-
-
-
-
 //this function heavily rely on the paranthesis enclosing the arguments
 function process() {
-    let i,j,k,takecount;
-    
-    console.log('The input calcStr string: ',calcStr);
+    let i, j, k, takecount;
 
+    console.log("The input calcStr string: ", calcStr);
 
     //checking if brackets are proper, if not it will prompt an error, clears the calculator screen and returns
-    if(!hasProperBrackets())    return;
+    if (!hasProperBrackets()) return;
 
     //checking if, there exist any sqrt symbol, if yes, then tranforming √(x) to ((x)^(1/2))
-    if(!checkandtransformsqrt())    return;
+    if (!checkandtransformsqrt()) return;
 
-    console.log('transformed the sqrt:',calcStr)
-
+    console.log("transformed the sqrt:", calcStr);
 
     //main string adjustments; adding proper brackets to ease the process further, since this function heavily rely on brackets
-    for(let i=0; i<calcStr.length; i++){
+    for (let i = 0; i < calcStr.length; i++) {
         //in this algorithm, i am just seeing the character 1 step ahead
         //and then correspondingly making the adding the multiply,'*' or brackets, '()'.
 
-        if(i!=calcStr.length-1 && /^[)\]}]$/.test(calcStr[i])){
-            if( /^[0-9a-zπ\[({]$/.test(calcStr[i+1])){
-                calcStr=calcStr.slice(0,i+1)+'*'+calcStr.slice(i+1,);
+        if (i != calcStr.length - 1 && /^[)\]}]$/.test(calcStr[i])) {
+            if (/^[0-9a-zπ\[({]$/.test(calcStr[i + 1])) {
+                calcStr = calcStr.slice(0, i + 1) + "*" + calcStr.slice(i + 1);
                 i++;
             }
-
-        }else if(i!=calcStr.length-1 && /^[0-9π]$/.test(calcStr[i])){
-            if(/^[a-zπ(\[{]$/.test(calcStr[i+1])){
-                calcStr=calcStr.slice(0,i+1)+'*'+calcStr.slice(i+1,);
+        } else if (i != calcStr.length - 1 && /^[0-9π]$/.test(calcStr[i])) {
+            if (/^[a-zπ(\[{]$/.test(calcStr[i + 1])) {
+                calcStr = calcStr.slice(0, i + 1) + "*" + calcStr.slice(i + 1);
                 i++;
             }
-        }else if (i!=calcStr.length-1 && /^[a-hj-z]$/.test(calcStr[i])){
-            //this is the most confusing part of this formatting, 
+        } else if (i != calcStr.length - 1 && /^[a-hj-z]$/.test(calcStr[i])) {
+            //this is the most confusing part of this formatting,
             //here formatting the 'e' and all trignometric functions i.e. sin, sinh, arcsin etc., functions
 
-            if(calcStr[i]=='e'){
-                if(/^[0-9eπ(\[{stal]$/.test(calcStr[i+1])){
-                    calcStr=calcStr.slice(0,i+1)+'*'+calcStr.slice(i+1,);
+            if (calcStr[i] == "e") {
+                if (/^[0-9eπ(\[{stal]$/.test(calcStr[i + 1])) {
+                    calcStr =
+                        calcStr.slice(0, i + 1) + "*" + calcStr.slice(i + 1);
                     i++;
-                }else if (i<=calcStr.length-3){
-                    if(calcStr[i+1]=='c' && calcStr[i+2]=='o'){
-                        calcStr=calcStr.slice(0,i+1)+'*'+calcStr.slice(i+1,);
+                } else if (i <= calcStr.length - 3) {
+                    if (calcStr[i + 1] == "c" && calcStr[i + 2] == "o") {
+                        calcStr =
+                            calcStr.slice(0, i + 1) +
+                            "*" +
+                            calcStr.slice(i + 1);
                         i++;
                     }
                 }
+            } else if (/^[nstchg]$/.test(calcStr[i])) {
+                if (
+                    i >= calcStr - 2 ||
+                    (calcStr[i + 1] == "e" && calcStr[i + 2] != "c") ||
+                    /^[0-9π\[{]$/.test(calcStr[i + 1])
+                ) {
+                    calcStr =
+                        calcStr.slice(0, i + 1) + "(" + calcStr.slice(i + 1);
 
-            }else if (/^[nstchg]$/.test(calcStr[i])){
-               
-                if(i>=calcStr-2 || (calcStr[i+1]=='e' && calcStr[i+2]!='c') || /^[0-9π\[{]$/.test(calcStr[i+1])){
-                    calcStr=calcStr.slice(0,i+1)+'('+calcStr.slice(i+1,);
-
-                    if(/^[0-9πe]$/.test(calcStr[i+2])){
-                        
-                        for(j=i+3;j<calcStr.length;j++){
-                            if(!(/^[0-9πe]$/.test(calcStr[j]))){
+                    if (/^[0-9πe]$/.test(calcStr[i + 2])) {
+                        for (j = i + 3; j < calcStr.length; j++) {
+                            if (!/^[0-9πe]$/.test(calcStr[j])) {
                                 break;
                             }
                         }
 
-                        calcStr=calcStr.slice(0,j)+')'+calcStr.slice(j,);
-                    }else{
+                        calcStr = calcStr.slice(0, j) + ")" + calcStr.slice(j);
+                    } else {
                         let key;
-                        for(key in brackets){
-                            if(brackets[key][0]==calcStr[i+2]){
+                        for (key in brackets) {
+                            if (brackets[key][0] == calcStr[i + 2]) {
                                 break;
                             }
                         }
 
-                        takecount=1;
-                        if(calcStr[i+2]==brackets[key][0]){
-                            for(j=i+3;j<calcStr.length;j++){
-                                if(calcStr[j]==brackets[key][0]){
+                        takecount = 1;
+                        if (calcStr[i + 2] == brackets[key][0]) {
+                            for (j = i + 3; j < calcStr.length; j++) {
+                                if (calcStr[j] == brackets[key][0]) {
                                     takecount++;
-                                }else if(calcStr[j]==brackets[key][1]){
+                                } else if (calcStr[j] == brackets[key][1]) {
                                     takecount--;
                                 }
 
-                                if(!takecount){
+                                if (!takecount) {
                                     break;
                                 }
                             }
                         }
 
-                        calcStr=calcStr.slice(0,j+1)+')'+calcStr.slice(j+1,);
-                        
+                        calcStr =
+                            calcStr.slice(0, j + 1) +
+                            ")" +
+                            calcStr.slice(j + 1);
                     }
-
                 }
             }
-        }else if(i!=calcStr.length-1 && /^[!i]$/.test(calcStr[i]) && calcStr[i+1]!='n'){
-            if(!(/^[+\-*/\]})^!]$/.test(calcStr[i+1]))){
-                calcStr=calcStr.slice(0,i+1)+'*'+calcStr.slice(i+1,);
+        } else if (
+            i != calcStr.length - 1 &&
+            /^[!i]$/.test(calcStr[i]) &&
+            calcStr[i + 1] != "n"
+        ) {
+            if (!/^[+\-*/\]})^!]$/.test(calcStr[i + 1])) {
+                calcStr = calcStr.slice(0, i + 1) + "*" + calcStr.slice(i + 1);
             }
-            
         }
     }
 
+    if (!hasProperBrackets()) return;
 
-    if(!hasProperBrackets())    return;
+    console.log("making general tweaking: ", calcStr);
 
-    console.log('making general tweaking: ',calcStr);
-    
     transformpower();
 
-    if(!hasProperBrackets()) return;
-    console.log('After transforming power: ',calcStr);
+    if (!hasProperBrackets()) return;
+    console.log("After transforming power: ", calcStr);
 
     factorial_process();
 
-    if(!hasProperBrackets()) return;
-    console.log('After factorial processing: ',calcStr);
+    if (!hasProperBrackets()) return;
+    console.log("After factorial processing: ", calcStr);
 
-    console.log('The final string: ',calcStr);
+    console.log("The final string: ", calcStr);
     return;
 }
 
-
-
-
-
-
-
-function hasProperBrackets(){
-    let counter={
+function hasProperBrackets() {
+    let counter = {
         p: 0,
         b: 0,
-        m: 0
+        m: 0,
     };
-    let errbrackets="";
+    let errbrackets = "";
 
-
-    for(let i=0;i<calcStr.length;i++){
-        if(/^[(\[{]$/.test(calcStr[i])){
-            if(calcStr[i]=='('){
+    for (let i = 0; i < calcStr.length; i++) {
+        if (/^[(\[{]$/.test(calcStr[i])) {
+            if (calcStr[i] == "(") {
                 counter.p++;
-            }else if (calcStr[i]=='['){
+            } else if (calcStr[i] == "[") {
                 counter.b++;
-            }else{
+            } else {
                 counter.m++;
             }
-
-        }else if(/^[)\]}]$/.test(calcStr[i])){
-            if(calcStr[i]==')'){
-                if(--counter.p<0){
-                    
-                    alert('Please include proper brackets: ()' );
+        } else if (/^[)\]}]$/.test(calcStr[i])) {
+            if (calcStr[i] == ")") {
+                if (--counter.p < 0) {
+                    alert("Please include proper brackets: ()");
                     // clearScreen();
                     return;
                 }
-
-            }else if (calcStr[i]==']'){
-                if(--counter.b<0){
-                    alert('Please include proper brackets: []' );
+            } else if (calcStr[i] == "]") {
+                if (--counter.b < 0) {
+                    alert("Please include proper brackets: []");
                     // clearScreen();
                     return;
                 }
-
-            }else{
-                if(--counter.m<0){
-                    alert('Please include proper brackets: | |' );
+            } else {
+                if (--counter.m < 0) {
+                    alert("Please include proper brackets: | |");
                     // clearScreen();
                     return;
                 }
@@ -979,46 +908,50 @@ function hasProperBrackets(){
         }
     }
 
-    for(key in counter){
-        
-        if(counter[key]){
-            if(key=='p'){
-                errbrackets+='( ) ';
-            }else if(key=='b'){
-                errbrackets+='[ ] ';
-            }else{
-                errbrackets+='| | '
+    for (key in counter) {
+        if (counter[key]) {
+            if (key == "p") {
+                errbrackets += "( ) ";
+            } else if (key == "b") {
+                errbrackets += "[ ] ";
+            } else {
+                errbrackets += "| | ";
             }
         }
-
     }
-    if(errbrackets.length){
-        alert('Please include proper brackets: ' + errbrackets);
+    if (errbrackets.length) {
+        alert("Please include proper brackets: " + errbrackets);
         // clearScreen();
         return false;
     }
     return true;
 }
 
-
-function checkandtransformsqrt(){
-    let i,j,k;
+function checkandtransformsqrt() {
+    let i, j, k;
     let takecount;
 
-    for(i=0;i<calcStr.length;i++){
-        if(i!=calcStr.length-1 && calcStr[i]=='√'){
-            if(calcStr[i+1]=='('){
-                takecount=1;
-                for(j=i+2;j<calcStr.length;j++){
-                    if(calcStr[j]=='(') takecount++;
-                    if(calcStr[j]==')') takecount--;
+    for (i = 0; i < calcStr.length; i++) {
+        if (i != calcStr.length - 1 && calcStr[i] == "√") {
+            if (calcStr[i + 1] == "(") {
+                takecount = 1;
+                for (j = i + 2; j < calcStr.length; j++) {
+                    if (calcStr[j] == "(") takecount++;
+                    if (calcStr[j] == ")") takecount--;
 
-                    if(!takecount) break;
+                    if (!takecount) break;
                 }
 
-                calcStr=calcStr.slice(0,i)+'('+calcStr.slice(i+1,j+1)+'^(1/2))'+calcStr.slice(j+1,);
-            }else{
-                alert("Please enclose the argument of Square Root(√) in proper Paranthesis...");
+                calcStr =
+                    calcStr.slice(0, i) +
+                    "(" +
+                    calcStr.slice(i + 1, j + 1) +
+                    "^(1/2))" +
+                    calcStr.slice(j + 1);
+            } else {
+                alert(
+                    "Please enclose the argument of Square Root(√) in proper Paranthesis..."
+                );
                 return false;
             }
         }
@@ -1027,199 +960,181 @@ function checkandtransformsqrt(){
     return true;
 }
 
+function transformpower() {
+    let i, j, k;
+    let takecount, argent;
 
-function transformpower(){
-    let i,j,k;
-    let takecount,argent;
+    for (i = 0; i < calcStr.length; i++) {
+        if (i != 0 && calcStr[i] == "^" && i != calcStr.length - 1) {
+            if (calcStr[i - 1] == ")") {
+                takecount = 1;
+                for (j = i - 2; j >= 0; j--) {
+                    if (calcStr[j] == ")") takecount++;
+                    if (calcStr[j] == "(") takecount--;
 
-    for(i=0;i<calcStr.length;i++){
-        if(i!=0 && calcStr[i]=='^' && i!=calcStr.length-1){
-            if(calcStr[i-1]==')'){
-                takecount=1;
-                for(j=i-2;j>=0;j--){
-                    if(calcStr[j]==')') takecount++;
-                    if(calcStr[j]=='(') takecount--;
-
-                    if(!takecount && !(/^[a-z]$/.test(calcStr[j-1]))){
-                        if(/^[a-z]$/.test(calcStr[j])){
-                            calcStr=calcStr.slice(0,i)+')'+calcStr.slice(i,);
-                            calcStr=calcStr.slice(0,j)+'('+calcStr.slice(j,);
-                            i+=2;
+                    if (!takecount && !/^[a-z]$/.test(calcStr[j - 1])) {
+                        if (/^[a-z]$/.test(calcStr[j])) {
+                            calcStr =
+                                calcStr.slice(0, i) + ")" + calcStr.slice(i);
+                            calcStr =
+                                calcStr.slice(0, j) + "(" + calcStr.slice(j);
+                            i += 2;
                         }
                         break;
-                    }  
+                    }
                 }
 
-                if(calcStr[j-1]!='('){
-                    calcStr=calcStr.slice(0,j)+'('+calcStr.slice(j,);
+                if (calcStr[j - 1] != "(") {
+                    calcStr = calcStr.slice(0, j) + "(" + calcStr.slice(j);
                     i++;
                 }
-                
-
-            }else{
-                calcStr=calcStr.slice(0,i)+')'+calcStr.slice(i,);
+            } else {
+                calcStr = calcStr.slice(0, i) + ")" + calcStr.slice(i);
                 i++;
 
-                if(/^[0-9]$/.test(calcStr[i-2])){
-                    for(j=i-3;j>=0;j--){
-                        if(!(/^[0-9]$/.test(calcStr[j])))   break;
+                if (/^[0-9]$/.test(calcStr[i - 2])) {
+                    for (j = i - 3; j >= 0; j--) {
+                        if (!/^[0-9]$/.test(calcStr[j])) break;
                     }
-
-                }else if(/^[πe]$/.test(calcStr[i-2])){
-                    j=i-3;
-
-                }else if(/^[\]}]$/.test(calcStr[i-2])){
-
+                } else if (/^[πe]$/.test(calcStr[i - 2])) {
+                    j = i - 3;
+                } else if (/^[\]}]$/.test(calcStr[i - 2])) {
                     let key;
-                    for(key in brackets){
-                        if(brackets[key][1]==calcStr[i-2]) break;
+                    for (key in brackets) {
+                        if (brackets[key][1] == calcStr[i - 2]) break;
                     }
 
-                    takecount=1;
-                    for(j=i-3;j>=0;j--){
-                        if(calcStr[j]==brackets[key][1])    takecount++;
-                        if(calcStr[j]==brackets[key][0])    takecount--;
-                        
-                        if(!takecount){
+                    takecount = 1;
+                    for (j = i - 3; j >= 0; j--) {
+                        if (calcStr[j] == brackets[key][1]) takecount++;
+                        if (calcStr[j] == brackets[key][0]) takecount--;
+
+                        if (!takecount) {
                             j--;
                             break;
                         }
                     }
                 }
-                
 
-
-                calcStr=calcStr.slice(0,j+1)+'(('+calcStr.slice(j+1,);
-                i+=2;
+                calcStr = calcStr.slice(0, j + 1) + "((" + calcStr.slice(j + 1);
+                i += 2;
             }
 
+            if (calcStr[i + 1] == "(") {
+                takecount = 1;
+                for (j = i + 2; j < calcStr.length; j++) {
+                    if (calcStr[j] == "(") takecount++;
+                    if (calcStr[j] == ")") takecount--;
 
-            if(calcStr[i+1]=='('){
-                takecount=1;
-                for(j=i+2;j<calcStr.length;j++){
-                    if(calcStr[j]=='(') takecount++;
-                    if(calcStr[j]==')') takecount--;
-
-                    if(!takecount)  break;
+                    if (!takecount) break;
                 }
 
-                if(calcStr[j+1]!=')'){
-                    calcStr=calcStr.slice(0,j+1)+')'+calcStr.slice(j+1,);
+                if (calcStr[j + 1] != ")") {
+                    calcStr =
+                        calcStr.slice(0, j + 1) + ")" + calcStr.slice(j + 1);
                 }
-               
-            }else{
-                calcStr=calcStr.slice(0,i+1)+'('+calcStr.slice(i+1,);
+            } else {
+                calcStr = calcStr.slice(0, i + 1) + "(" + calcStr.slice(i + 1);
 
-                if(/^[0-9]$/.test(calcStr[i+2])){
-                    for(j=i+3;j<calcStr.length;j++){
-                        if(!(/^[0-9]$/.test(calcStr[j])))   break;
-
+                if (/^[0-9]$/.test(calcStr[i + 2])) {
+                    for (j = i + 3; j < calcStr.length; j++) {
+                        if (!/^[0-9]$/.test(calcStr[j])) break;
                     }
-
-                }else if (/^[πe]$/.test(calcStr[i+2])){
-                    j=i+3;
-
-                }else if(/^[a-df-z]$/.test(calcStr[i+2])){
-                    takecount=0;
-                    argent=false;
-                    for(j=i+3;j<calcStr.length;j++){
-                        if(calcStr[j]=='('){
+                } else if (/^[πe]$/.test(calcStr[i + 2])) {
+                    j = i + 3;
+                } else if (/^[a-df-z]$/.test(calcStr[i + 2])) {
+                    takecount = 0;
+                    argent = false;
+                    for (j = i + 3; j < calcStr.length; j++) {
+                        if (calcStr[j] == "(") {
                             takecount++;
-                            if(!argent) argent=true;
-                        } 
-                        if(calcStr[j]==')') takecount--;
+                            if (!argent) argent = true;
+                        }
+                        if (calcStr[j] == ")") takecount--;
 
-                        if(argent && !takecount){
+                        if (argent && !takecount) {
                             j++;
                             break;
                         }
                     }
-                }else if(/^[\[{]$/.test(calcStr[i+2])){
-
+                } else if (/^[\[{]$/.test(calcStr[i + 2])) {
                     let key;
-                    for(key in brackets){
-                        if(brackets[key][0]==calcStr[i+2]) break;
+                    for (key in brackets) {
+                        if (brackets[key][0] == calcStr[i + 2]) break;
                     }
 
-                    takecount=1;
-                    for(j=i+3;j<calcStr.length;j++){
-                        if(calcStr[j]==brackets[key][0])    takecount++;
-                        if(calcStr[j]==brackets[key][1])    takecount--;
-                        
-                        if(!takecount){
+                    takecount = 1;
+                    for (j = i + 3; j < calcStr.length; j++) {
+                        if (calcStr[j] == brackets[key][0]) takecount++;
+                        if (calcStr[j] == brackets[key][1]) takecount--;
+
+                        if (!takecount) {
                             j++;
                             break;
                         }
                     }
                 }
-                
-                calcStr=calcStr.slice(0,j)+'))'+calcStr.slice(j,);
+
+                calcStr = calcStr.slice(0, j) + "))" + calcStr.slice(j);
             }
-
         }
-
     }
 
     return;
 }
 
-function factorial_process(){
-    let i,j;
+function factorial_process() {
+    let i, j;
     let takecount;
 
-
-    for(i=0;i<calcStr.length;i++){
-        if(i!=0 && calcStr[i]=='!'){
-            if(calcStr[i-1]!=')'){
-                calcStr=calcStr.slice(0,i)+')'+calcStr.slice(i,);
+    for (i = 0; i < calcStr.length; i++) {
+        if (i != 0 && calcStr[i] == "!") {
+            if (calcStr[i - 1] != ")") {
+                calcStr = calcStr.slice(0, i) + ")" + calcStr.slice(i);
                 i++;
+            } else {
+                takecount = 1;
+                for (j = i - 2; j >= 0; j--) {
+                    if (calcStr[j] == ")") takecount++;
+                    if (calcStr[j] == "(") takecount--;
 
-            }else{
-
-                takecount=1;
-                for(j=i-2;j>=0;j--){
-                    if(calcStr[j]==')') takecount++;
-                    if(calcStr[j]=='(') takecount--;
-
-                    if(!takecount && !(/^[a-z]$/.test(calcStr[j-1])))   break;
+                    if (!takecount && !/^[a-z]$/.test(calcStr[j - 1])) break;
                 }
 
-                if(/^[a-z]$/.test(calcStr[j])){
-                    calcStr=calcStr.slice(0,i)+')'+calcStr.slice(i,);
+                if (/^[a-z]$/.test(calcStr[j])) {
+                    calcStr = calcStr.slice(0, i) + ")" + calcStr.slice(i);
                     i++;
-                    calcStr=calcStr.slice(0,j)+'('+calcStr.slice(j,);
+                    calcStr = calcStr.slice(0, j) + "(" + calcStr.slice(j);
                     i++;
                 }
 
                 continue;
-                
             }
-            
-            if(/^[0-9]$/.test(calcStr[i-2])){
-                for(j=i-3;j>=0;j--){
-                    if(!(/^[0-9]$/.test(calcStr[j])))   break;
-                }
 
-            }else if(/^[πei]$/.test(calcStr[i-2])){
-                j=i-3;
-            }else if(/^[\]}]$/.test(calcStr[i-2])){
+            if (/^[0-9]$/.test(calcStr[i - 2])) {
+                for (j = i - 3; j >= 0; j--) {
+                    if (!/^[0-9]$/.test(calcStr[j])) break;
+                }
+            } else if (/^[πei]$/.test(calcStr[i - 2])) {
+                j = i - 3;
+            } else if (/^[\]}]$/.test(calcStr[i - 2])) {
                 let key;
-                for(key in brackets){
-                    if(brackets[key][1]==calcStr[i-2])  break;
+                for (key in brackets) {
+                    if (brackets[key][1] == calcStr[i - 2]) break;
                 }
 
-                takecount=1;
-                for(j=i-3;j>=0;j--){
-                    if(brackets[key][1]==calcStr[j])    takecount++;
-                    if(brackets[key][0]==calcStr[j])    takecount--;
+                takecount = 1;
+                for (j = i - 3; j >= 0; j--) {
+                    if (brackets[key][1] == calcStr[j]) takecount++;
+                    if (brackets[key][0] == calcStr[j]) takecount--;
 
-                    if(!takecount) break;
+                    if (!takecount) break;
                 }
 
                 j--;
             }
 
-            calcStr=calcStr.slice(0,j+1)+'('+calcStr.slice(j+1,);
+            calcStr = calcStr.slice(0, j + 1) + "(" + calcStr.slice(j + 1);
             i++;
         }
     }
@@ -1227,89 +1142,77 @@ function factorial_process(){
     return;
 }
 
-
-
-
-
-
-
-
-function calculate(){
-    let i,j,k,l;
-    let counter=0,arg,arg1,arg2,func;
+function calculate() {
+    let i, j, k, l;
+    let counter = 0,
+        arg,
+        arg1,
+        arg2,
+        func;
     let ff;
 
-    for(i=0;i<calcStr.length;i++){
-        if(/^[)\]}]$/.test(calcStr[i])) counter++;
-        if(counter && /^[(\[{]$/.test(calcStr[i])) counter--;
-
+    for (i = 0; i < calcStr.length; i++) {
+        if (/^[)\]}]$/.test(calcStr[i])) counter++;
+        if (counter && /^[(\[{]$/.test(calcStr[i])) counter--;
 
         // if(calcStr[l]=='^'){
         //     arg1=eval(arg1).toString();
         //     k=j-1;
         // }
 
+        if (counter) {
+            arg1 = "";
+            arg2 = "";
+            func = "";
+            ff = false;
 
-
-        if(counter){
-            arg1='';
-            arg2='';
-            func='';
-            ff= false;
-
-
-            for(j=i-1;j>=0;j--){
-                
-
-                if(ff){
-                    func+=calcStr[j];
-                    if(!(/^[a-z]$/.test(calcStr[j-1]))) break;
-                    
-                    
-                }else{
-                    if(/^[(\[{]$/.test(calcStr[j])){
+            for (j = i - 1; j >= 0; j--) {
+                if (ff) {
+                    func += calcStr[j];
+                    if (!/^[a-z]$/.test(calcStr[j - 1])) break;
+                } else {
+                    if (/^[(\[{]$/.test(calcStr[j])) {
                         counter--;
-                        if(j!=0 && /^[a-z]$/.test(calcStr[j-1])){
-                            ff=true;
+                        if (j != 0 && /^[a-z]$/.test(calcStr[j - 1])) {
+                            ff = true;
                             continue;
-                        }else{
-                            if(calcStr[i+1]=='!'){
-                                func+='!';
+                        } else {
+                            if (calcStr[i + 1] == "!") {
+                                func += "!";
                                 i++;
-                            }else{
-                                func+=calcStr[j];
+                            } else {
+                                func += calcStr[j];
                             }
-                      
+
                             break;
                         }
                     }
 
-
-                    arg1+=calcStr[j];
+                    arg1 += calcStr[j];
                 }
-                
             }
 
-            console.log('before i:',i);
-            i-=evaluate(reverseStr(func),reverseStr(arg1),reverseStr(arg2),j,i);                  //j: starting index, i: ending index; eg, in sin(90), j=0 and i=6
-            console.log(calcStr,'after i:',i);
-
+            console.log("before i:", i);
+            i -= evaluate(
+                reverseStr(func),
+                reverseStr(arg1),
+                reverseStr(arg2),
+                j,
+                i
+            ); //j: starting index, i: ending index; eg, in sin(90), j=0 and i=6
+            console.log(calcStr, "after i:", i);
         }
-
-
     }
 
-    let newdiv = document.createElement('div');
+    let newdiv = document.createElement("div");
     if (calcStr.includes("Undefined")) {
         newdiv.innerHTML = `<div>Undefined</div>`;
     } else {
-
-        calcStr = `${roundoff_n(parseFloat(eval(calcStr)),ndec)}`;
+        calcStr = `${roundoff_n(parseFloat(eval(calcStr)), ndec)}`;
         dispStr = calcStr;
         newdiv.innerHTML = `<div>${dispStr}</div>`;
     }
 
-    
     console.log(calcStr);
-    display.insertAdjacentHTML('afterbegin', newdiv.innerHTML);
+    display.insertAdjacentHTML("afterbegin", newdiv.innerHTML);
 }
